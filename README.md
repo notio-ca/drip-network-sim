@@ -1,7 +1,7 @@
 # DRIP Network Crypto Faucet Simulator
 Forward through time and recompound / hydrate to calculate the outcome.
 
-This project is currently alpha
+This project is currently beta, tester needed
 
 * VueJS application
 * Keep it simple approach
