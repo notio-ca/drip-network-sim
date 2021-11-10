@@ -1,7 +1,7 @@
 var app = new Vue({
     el: '#app',
     data: {
-      version:"0.1",
+      version:"0.2",
       config: {
         day_interest: 0.01,
         day_max: 365,
@@ -13,15 +13,19 @@ var app = new Vue({
       bnb_price_usd: 100,
       bnb_drip_ratio: 0.01,
       gas_fee_bnb: 0.003486495,
+      gas_fee_total: 0.000,
       faucet:{
           available: 0.000,
           deposit: 0.000,
           deposit_tx: [],
           claimed: 0.000,
-          last_day_income: 0.000
+          last_day_income: 0.000,
+          investment: 0.00,
+          withdraw: 0.00
       },
       drip_network_income:0,
       sim: {
+          compound_mode: "NONE",
           day_passed: 0,
           day_forward: 1
       }
@@ -33,19 +37,31 @@ var app = new Vue({
         drip_bnb: function() { return this.$options.filters.decimal_3(this.bnb_drip_ratio); },
         drip_usd: function() { return this.$options.filters.decimal_3(this.bnb_price_usd * this.bnb_drip_ratio); },
         faucet_max_payout: function() { return this.$options.filters.decimal_3(this.faucet.deposit * (this.config.day_max / 100)); },
+        revenue_usd: function() { 
+            total_gas_fee_usd = this.bnb_to_usd(this.gas_fee_total);
+            withdraw_usd = this.drip_to_usd(this.faucet.withdraw);
+            return this.$options.filters.decimal_3(withdraw_usd - this.faucet.investment - total_gas_fee_usd); 
+        }
     },
     methods: {
       action(event, cmd) {
         var val = event.target.getAttribute("data-val");
         switch (cmd) {
-            case "balance-deposit":
+            case "deposit":
                 this.deposit(val);
+                break;
+            case "withdraw":
+                this.withdraw(val);
                 break;
             case "day-forward":
                 this.next_day(val);
                 break;
+            case "sim-compound-mode":
+                this.sim.compound_mode = val;
+                break;
             case "compound":
                 this.compound(val);
+                break;
         }
    
       },
@@ -57,6 +73,7 @@ var app = new Vue({
             day_left: this.config.day_max, 
             interest_paid:0.000
         }
+        this.faucet.investment += amount;
         this.faucet.deposit += tx.amount;
         this.faucet.deposit_tx.push(tx);
       },
@@ -73,10 +90,16 @@ var app = new Vue({
         this.faucet.deposit_tx.push(tx);
         this.faucet.claimed += this.faucet.available;
         this.faucet.available = 0;
+        this.gas_fee_total += this.gas_fee_bnb;
       },
-      withdraw() {
+      withdraw(amount) {
         if (this.faucet.available == 0) { return false; }
-
+        tax = this.faucet.available * this.config.tax_withdraw;
+        this.drip_network_income += tax;
+        this.faucet.withdraw += (this.faucet.available - tax);
+        this.faucet.claimed += this.faucet.available;
+        this.faucet.available = 0;
+        this.gas_fee_total += this.gas_fee_bnb;
       },
       next_day(num_of_day) {
         for (var d = 1; d <= num_of_day; d++) { 
@@ -90,7 +113,9 @@ var app = new Vue({
             }
             this.faucet.available += this.faucet.last_day_income;
             this.sim.day_passed += 1;
+            if (this.sim.compound_mode == "EVERYDAY") { this.compound(); }
         }
+        if (this.sim.compound_mode == "EVERYSTEP") { this.compound(); }
       },
       drip_to_usd: function(value) {
         value = parseFloat(value) *  (this.bnb_price_usd * this.bnb_drip_ratio);
@@ -109,3 +134,17 @@ var app = new Vue({
       }
     }
   });
+
+// ----------------------------------------------------------------------------------------
+// -- BOOTSTRAP ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+(function () {
+    var btn_all = document.querySelectorAll('.btn');
+    for (btn of btn_all) {
+        btn.addEventListener('mouseup', function(event) {
+            event.currentTarget.blur();
+            event.target.parentNode.blur();
+            document.activeElement.blur();
+        });
+    }
+})();

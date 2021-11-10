@@ -19,7 +19,7 @@
         
                 <div> <div>BNB Price</div> <div><input v-model="bnb_price_usd" type="text"> USD</div></div>
                 <div> <div>BNB/DRIP Ratio</div> <div><input v-model="bnb_drip_ratio" type="text"> </div></div>
-                <div> <div>Gas Fee (compound)</div> <div><input v-model="gas_fee_bnb" type="text"> BNB ({{ bnb_to_usd(gas_fee_bnb) }} USD)</div></div>
+                <div> <div>Gas Fee</div> <div><input v-model="gas_fee_bnb" type="text"> BNB ({{ bnb_to_usd(gas_fee_bnb) }} USD)</div></div>
                 <div> <div>DRIP Price</div> <div>{{ drip_usd }} USD / {{ drip_bnb }} BNB </div> </div>
                 <div> <div></div> <div></div> </div>
         
@@ -28,35 +28,66 @@
                     <div>Balance</div>
                     <div> 
                         <input v-model="balance_drip" type="text"> DRIP
-                        <div class="btn btn-primary my-1" @click="action($event, 'balance-deposit')" :data-val="balance_drip">DEPOSIT</div>
+                        <span><div class="btn btn-primary my-1" @click="action($event, 'deposit')" :data-val="balance_drip">DEPOSIT</div></span>
                     </div>
                 </div>
         
                 <div class="bg-dark"> <div>Faucet</div> <div></div> </div>
-                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income }}</div> </div>
-                <div> <div>Deposits</div> <div>{{ faucet.deposit }} ({{ drip_to_usd(faucet.deposit) }} USD)</div> </div>
+                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income|decimal_3 }} ({{ drip_to_usd(faucet.last_day_income) }} USD)</div> </div>
+                <div> <div>Deposits</div> <div>{{ faucet.deposit|decimal_3 }} ({{ drip_to_usd(faucet.deposit) }} USD)</div> </div>
                 <div> 
                     <div>Available</div> 
                     <div>
                         {{ faucet.available|decimal_3 }} ({{ drip_to_usd(faucet.available) }} USD)
-                        <div v-if="faucet.available > 0" class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
-                        <!-- <div v-if="faucet.available > 0" class="btn btn-primary mx-2" @click="action($event, 'balance-withdraw')" :data-val="faucet.available">CLAIM</div>-->
+                        <span v-if="faucet.available > 0">
+                            
+                            <div class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
+                            <div class="btn btn-primary mx-2" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
+                        </span>
+                        <span v-else>To claim, set hydrate to none and step forward.</span>
                     </div> 
                 </div>
-                <div> <div>Claimed</div> <div>{{ faucet.claimed }} ({{ drip_to_usd(faucet.claimed) }} USD)</div> </div>
-                <div> <div>Max Payout</div> <div>{{ faucet_max_payout }} ({{ drip_to_usd(faucet_max_payout) }} USD)</div> </div>
-                <div> <div></div> <div></div> </div>
-                <div> <div>Drip Netork Income</div> <div>{{ drip_network_income }} ({{ drip_to_usd(drip_network_income) }} USD)</div> </div>
+                <div> <div>Claimed</div> <div>{{ faucet.claimed|decimal_3 }} ({{ drip_to_usd(faucet.claimed) }} USD)</div> </div>
+                <div> <div>Max Payout</div> <div>{{ faucet_max_payout|decimal_3 }} ({{ drip_to_usd(faucet_max_payout) }} USD)</div> </div>
+                
+                <div> <div>Investment</div> <div>{{ faucet.investment|decimal_3 }} BNB ({{ drip_to_usd(faucet.investment) }} USD)</div> </div>
+                <div> <div>Withdraw</div> <div>{{ faucet.withdraw|decimal_3 }} BNB ({{ drip_to_usd(faucet.withdraw) }} USD)</div> </div>
+                <div> <div>Total Gas Fee</div> <div>{{ gas_fee_total|decimal_3 }} BNB ({{ bnb_to_usd(gas_fee_total) }} USD)</div> </div>
+                <div> <div>Total Revenue</div> <div>{{ revenue_usd }} USD</div> </div>
+
+
+                <div> <div>Total Network Taxes</div> <div>{{ drip_network_income|decimal_3 }} ({{ drip_to_usd(drip_network_income) }} USD)</div> </div>
 
                 <div> <div></div> <div></div> </div>
         
                 <div class="bg-dark"> <div>Time Machine</div> <div></div> </div>
                 <div> <div>Days Passed</div> <div>{{ sim.day_passed }}</div> </div>
                 <div> 
-                    <div>Day Forward</div>
+                    <div>Hydrate (Compound)</div>
+                    <div>
+                        <span>
+                            <div class="btn-group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                                <label @click="action($event, 'sim-compound-mode')" data-val="NONE" class="btn btn-primary" for="btnradio1">None</label>
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                                <label @click="action($event, 'sim-compound-mode')" data-val="EVERYDAY" class="btn btn-primary" for="btnradio2">Everyday</label>
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                                <label @click="action($event, 'sim-compound-mode')" data-val="EVERYSTEP" class="btn btn-primary" for="btnradio3">Every Step</label>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div> 
+                    <div>Day Step Forward</div>
                     <div> 
-                        <input v-model="sim.day_forward" type="text"> Days
-                        <div v-if="faucet.deposit > 0" class="btn btn-primary my-1" @click="action($event, 'day-forward')" :data-val="sim.day_forward">GO</div>
+                        <span v-if="faucet.deposit > 0">
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="1">1</div>
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="5">5</div>
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="10">10</div>
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="100">100</div>
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="365">365</div>
+                        </span>
+                        <span v-else>Deposit Needed</span>
                     </div>
                 </div>        
         
