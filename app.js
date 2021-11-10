@@ -90,7 +90,7 @@ var app = new Vue({
         this.faucet.deposit_tx.push(tx);
         this.faucet.claimed += this.faucet.available;
         this.faucet.available = 0;
-        this.gas_fee_total += this.gas_fee_bnb;
+        this.gas_fee_total += parseFloat(this.gas_fee_bnb);
       },
       withdraw(amount) {
         if (this.faucet.available == 0) { return false; }
@@ -99,7 +99,7 @@ var app = new Vue({
         this.faucet.withdraw += (this.faucet.available - tax);
         this.faucet.claimed += this.faucet.available;
         this.faucet.available = 0;
-        this.gas_fee_total += this.gas_fee_bnb;
+        this.gas_fee_total += parseFloat(this.gas_fee_bnb);
       },
       next_day(num_of_day) {
         for (var d = 1; d <= num_of_day; d++) { 
