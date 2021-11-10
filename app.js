@@ -12,7 +12,7 @@ var app = new Vue({
       balance_drip: 100,
       bnb_price_usd: 100,
       bnb_drip_ratio: 0.01,
-      gas_fee_bnb: 0.003486495,
+      gas_fee_bnb: 0.022,
       gas_fee_total: 0.000,
       faucet:{
           available: 0.000,
@@ -33,16 +33,7 @@ var app = new Vue({
     created: function () {
   
     },
-    computed: {
-        drip_bnb: function() { return this.$options.filters.decimal_3(this.bnb_drip_ratio); },
-        drip_usd: function() { return this.$options.filters.decimal_3(this.bnb_price_usd * this.bnb_drip_ratio); },
-        faucet_max_payout: function() { return this.$options.filters.decimal_3(this.faucet.deposit * (this.config.day_max / 100)); },
-        revenue_usd: function() { 
-            total_gas_fee_usd = this.bnb_to_usd(this.gas_fee_total);
-            withdraw_usd = this.drip_to_usd(this.faucet.withdraw);
-            return this.$options.filters.decimal_3(withdraw_usd - this.faucet.investment - total_gas_fee_usd); 
-        }
-    },
+
     methods: {
       action(event, cmd) {
         var val = event.target.getAttribute("data-val");
@@ -90,7 +81,7 @@ var app = new Vue({
         this.faucet.deposit_tx.push(tx);
         this.faucet.claimed += this.faucet.available;
         this.faucet.available = 0;
-        this.gas_fee_total += parseFloat(this.gas_fee_bnb);
+        this.gas_fee_total += this.gas_fee_bnb;
       },
       withdraw(amount) {
         if (this.faucet.available == 0) { return false; }
@@ -99,7 +90,7 @@ var app = new Vue({
         this.faucet.withdraw += (this.faucet.available - tax);
         this.faucet.claimed += this.faucet.available;
         this.faucet.available = 0;
-        this.gas_fee_total += parseFloat(this.gas_fee_bnb);
+        this.gas_fee_total += this.gas_fee_bnb;
       },
       next_day(num_of_day) {
         for (var d = 1; d <= num_of_day; d++) { 
@@ -125,6 +116,17 @@ var app = new Vue({
         value = parseFloat(value) *  (this.bnb_price_usd);
         return value.toFixed(3);
       }
+    },    
+    computed: {
+        drip_bnb: function() { return this.$options.filters.decimal_3(this.bnb_drip_ratio); },
+        drip_usd: function() { return this.$options.filters.decimal_3(this.bnb_price_usd * this.bnb_drip_ratio); },
+        faucet_max_payout: function() { return this.$options.filters.decimal_3(this.faucet.deposit * (this.config.day_max / 100)); },
+        revenue_usd: function() { 
+            total_gas_fee_usd = this.bnb_to_usd(this.gas_fee_total);
+            withdraw_usd = this.drip_to_usd(this.faucet.withdraw);
+            return this.$options.filters.decimal_3(withdraw_usd - this.faucet.investment - total_gas_fee_usd); 
+        },
+        month_passed: function() { return (this.sim.day_passed / 30.5).toFixed(1); }
     },
     filters: {
       decimal_3: function (value) {
@@ -132,6 +134,7 @@ var app = new Vue({
         if (value == "NaN") { value = 0; } 
         return value;
       }
+
     }
   });
 
