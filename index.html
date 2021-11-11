@@ -18,27 +18,26 @@
                 <div class="bg-dark"> <div>Config</div> <div></div> </div>
         
                 <div> <div>BNB Price</div> <div><input v-model.number="bnb_price_usd" type="text"> USD</div></div>
-                <div> <div>BNB/DRIP Ratio</div> <div><input v-model.number="bnb_drip_ratio" type="text"> </div></div>
+                <div> <div>BNB/DRIP Ratio</div> <div><input v-model.number="bnb_drip_ratio" type="text"> {{ drip_usd }} USD</div></div>
                 <div> <div>Gas Fee</div> <div><input v-model.number="gas_fee_bnb" type="text"> BNB ({{ bnb_to_usd(gas_fee_bnb) }} USD)</div></div>
-                <div> <div>DRIP Price</div> <div>{{ drip_usd }} USD / {{ drip_bnb }} BNB </div> </div>
                 <div> <div></div> <div></div> </div>
         
                 <div class="bg-dark"> <div>Deposit</div> <div></div> </div>
                 <div> 
                     <div>Balance</div>
                     <div> 
-                        <input v-model="balance_drip" type="text"> DRIP
+                        <input v-model.number="balance_drip" type="text"> DRIP
                         <span><div class="btn btn-primary my-1" @click="action($event, 'deposit')" :data-val="balance_drip">DEPOSIT</div></span>
                     </div>
                 </div>
         
                 <div class="bg-dark"> <div>Faucet</div> <div></div> </div>
-                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income|decimal_3 }} ({{ drip_to_usd(faucet.last_day_income) }} USD)</div> </div>
-                <div> <div>Deposits</div> <div>{{ faucet.deposit|decimal_3 }} ({{ drip_to_usd(faucet.deposit) }} USD)</div> </div>
+                <div> <div>Last Day Income</div> <div>{{ drip_to_usd(faucet.last_day_income) }} USD / {{ faucet.last_day_income|decimal_3 }} DRIP</div> </div>
+                <div> <div>Deposits</div> <div>{{ drip_to_usd(faucet.deposit) }} USD / {{ faucet.deposit|decimal_3 }} DRIP</div> </div>
                 <div> 
                     <div>Available</div> 
                     <div>
-                        {{ faucet.available|decimal_3 }} ({{ drip_to_usd(faucet.available) }} USD)
+                        {{ drip_to_usd(faucet.available) }} USD / {{ faucet.available|decimal_3 }} DRIP
                         <span v-if="faucet.available > 0">
                             
                             <div class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
@@ -47,13 +46,13 @@
                         <span v-else>To claim, set hydrate to none and step forward.</span>
                     </div> 
                 </div>
-                <div> <div>Claimed</div> <div>{{ faucet.claimed|decimal_3 }} ({{ drip_to_usd(faucet.claimed) }} USD)</div> </div>
-                <div> <div>Max Payout</div> <div>{{ faucet_max_payout|decimal_3 }} ({{ drip_to_usd(faucet_max_payout) }} USD)</div> </div>
+                <div> <div>Claimed</div> <div>{{ drip_to_usd(faucet.claimed) }} USD / {{ faucet.claimed|decimal_3 }} DRIP</div> </div>
+                <div> <div>Max Payout</div> <div>{{ drip_to_usd(faucet_max_payout) }} USD / {{ faucet_max_payout|decimal_3 }} DRIP</div> </div>
                 
-                <div> <div>Investment</div> <div>{{ faucet.investment|decimal_3 }} BNB ({{ drip_to_usd(faucet.investment) }} USD)</div> </div>
-                <div> <div>Withdraw</div> <div>{{ faucet.withdraw|decimal_3 }} BNB ({{ drip_to_usd(faucet.withdraw) }} USD)</div> </div>
-                <div> <div>Total Gas Fee</div> <div>{{ gas_fee_total|decimal_3 }} BNB ({{ bnb_to_usd(gas_fee_total) }} USD)</div> </div>
-                <div> <div>Total Revenue</div> <div>{{ revenue_usd }} USD</div> </div>
+                <div> <div>Investment</div> <div>{{ drip_to_usd(faucet.investment) }} USD / {{ faucet.investment|decimal_3 }} DRIP</div> </div>
+                <div> <div>Withdraw</div> <div>{{ drip_to_usd(faucet.withdraw) }} USD / {{ faucet.withdraw|decimal_3 }} DRIP</div> </div>
+                <div> <div>Total Gas Fee</div> <div>{{ bnb_to_usd(gas_fee_total) }} USD / {{ gas_fee_total|decimal_3 }} DRIP</div> </div>
+                <div> <div>Total P&L</div> <div>{{ revenue_usd }} USD</div> </div>
 
 
                 <div> <div>Total Network Taxes</div> <div>{{ drip_network_income|decimal_3 }} ({{ drip_to_usd(drip_network_income) }} USD)</div> </div>
@@ -87,6 +86,7 @@
                             <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="7">7</div>
                             <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="10">10</div>
                             <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="14">14</div>
+                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="10">30</div>
                             <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="100">100</div>
                             <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="365">365</div>
                         </span>

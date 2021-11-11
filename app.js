@@ -9,10 +9,10 @@ var app = new Vue({
         tax_withdraw: 0.1,
         tax_compound: 0.05
       },
-      balance_drip: 100,
-      bnb_price_usd: 100,
-      bnb_drip_ratio: 0.01,
-      gas_fee_bnb: 0.022,
+      balance_drip: 15.73, //100,
+      bnb_price_usd: 615, //100,
+      bnb_drip_ratio: 0.03741699008180504, //0.01,
+      gas_fee_bnb: 0.0025,
       gas_fee_total: 0.000,
       faucet:{
           available: 0.000,
@@ -64,7 +64,7 @@ var app = new Vue({
             day_left: this.config.day_max, 
             interest_paid:0.000
         }
-        this.faucet.investment += amount;
+        this.faucet.investment += parseFloat(amount);
         this.faucet.deposit += tx.amount;
         this.faucet.deposit_tx.push(tx);
       },
@@ -118,13 +118,12 @@ var app = new Vue({
       }
     },    
     computed: {
-        drip_bnb: function() { return this.$options.filters.decimal_3(this.bnb_drip_ratio); },
         drip_usd: function() { return this.$options.filters.decimal_3(this.bnb_price_usd * this.bnb_drip_ratio); },
         faucet_max_payout: function() { return this.$options.filters.decimal_3(this.faucet.deposit * (this.config.day_max / 100)); },
         revenue_usd: function() { 
             total_gas_fee_usd = this.bnb_to_usd(this.gas_fee_total);
             withdraw_usd = this.drip_to_usd(this.faucet.withdraw);
-            return this.$options.filters.decimal_3(withdraw_usd - this.faucet.investment - total_gas_fee_usd); 
+            return this.$options.filters.decimal_3(withdraw_usd - this.drip_to_usd(this.faucet.investment) - total_gas_fee_usd); 
         },
         month_passed: function() { return (this.sim.day_passed / 30.5).toFixed(1); }
     },
