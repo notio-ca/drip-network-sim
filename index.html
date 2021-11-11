@@ -38,19 +38,23 @@
                     <div>Available</div> 
                     <div>
                         {{ drip_to_usd(faucet.available) }} USD / {{ faucet.available|decimal_3 }} DRIP
-                        <span v-if="faucet.available > 0">
-                            
-                            <div class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
-                            <div class="btn btn-primary mx-2" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
-                        </span>
-                        <span v-else style="font-size:13px;"><br>To claim, set hydrate to stop and step forward.</span>
+                        <div class="btn btn-primary mr-1" :class="(faucet.available == 0)?'disabled':''" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.available == 0)?'disabled':''" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
+                        <span v-if="faucet.available == 0" style="font-size:13px;"><br>To claim, set hydrate to stop and step forward.</span>
                     </div> 
                 </div>
                 <div> <div>Claimed</div> <div>{{ drip_to_usd(faucet.claimed) }} USD / {{ faucet.claimed|decimal_3 }} DRIP</div> </div>
                 <div> <div>Max Payout</div> <div>{{ drip_to_usd(faucet_max_payout) }} USD / {{ faucet_max_payout|decimal_3 }} DRIP</div> </div>
                 
                 <div> <div>Investment</div> <div>{{ drip_to_usd(faucet.investment) }} USD / {{ faucet.investment|decimal_3 }} DRIP</div> </div>
-                <div> <div>Withdraw</div> <div>{{ drip_to_usd(faucet.withdraw) }} USD / {{ faucet.withdraw|decimal_3 }} DRIP</div> </div>
+                <div>
+                    <div>Withdraw</div>
+                    <div>
+                        {{ drip_to_usd(faucet.withdraw) }} USD / {{ faucet.withdraw|decimal_3 }} DRIP
+                        <div class="btn btn-primary mr-1" :class="(faucet.withdraw == 0)?'disabled':''" @click="action($event, 'sell')" :data-val="faucet.withdraw">SELL</div>
+                    </div>
+                </div>
+                <div> <div>Sold</div> <div>{{ drip_to_usd(faucet.sold) }} USD / {{ faucet.sold|decimal_3 }} DRIP</div> </div>
                 <div> <div>Total Gas Fee</div> <div>{{ bnb_to_usd(gas_fee_total) }} USD / {{ gas_fee_total|decimal_3 }} DRIP</div> </div>
                 <div> <div>Total P&L</div> <div>{{ revenue_usd }} USD</div> </div>
 
@@ -79,18 +83,16 @@
                 <div> 
                     <div>Day Step Forward</div>
                     <div> 
-                        <span v-if="faucet.deposit > 0">
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="1">1</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="2">2</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="5">5</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="7">7</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="10">10</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="14">14</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="30">30</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="100">100</div>
-                            <div class="btn btn-primary mr-1" @click="action($event, 'day-forward')" data-val="365">365</div>
-                        </span>
-                        <span v-else>Deposit Needed</span>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''" @click="action($event, 'day-forward')" data-val="1">1</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="2">2</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="5">5</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="7">7</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="10">10</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="14">14</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="30">30</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="100">100</div>
+                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="365">365</div>
+                        <span v-if="faucet.deposit == 0" style="font-size:13px;">Deposit Needed</span>
                     </div>
                 </div>        
         
