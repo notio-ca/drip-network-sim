@@ -10,7 +10,7 @@ var app = new Vue({
         tax_compound: 0.05
       },
       balance_drip: 15.73, //100,
-      bnb_price_usd: 615, //100,
+      bnb_price_usd: 100,
       bnb_drip_ratio: 0.03741699008180504, //0.01,
       gas_fee_bnb: 0.0025,
       gas_fee_total: 0.000,
@@ -31,7 +31,7 @@ var app = new Vue({
       }
     },
     created: function () {
-  
+        this.quote_bnbusd();
     },
 
     methods: {
@@ -53,6 +53,9 @@ var app = new Vue({
             case "compound":
                 this.compound(val);
                 break;
+            case "get_bnb_quote":
+                this.quote_bnbusd(val);
+                break;               
         }
    
       },
@@ -115,6 +118,11 @@ var app = new Vue({
       bnb_to_usd: function(value) {
         value = parseFloat(value) *  (this.bnb_price_usd);
         return value.toFixed(3);
+      },
+      quote_bnbusd: function() {
+        API_Get("https://api.binance.com/api/v3/ticker/price?symbol=BNBBUSD", function (res) {
+            app.bnb_price_usd = parseFloat(res.price).toFixed(2);
+        });
       }
     },    
     computed: {
@@ -137,6 +145,14 @@ var app = new Vue({
     }
   });
 
+// ----------------------------------------------------------------------------------------
+// -- TOOLS -------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------
+async function API_Get(url, callback) {
+    req = await fetch(url);
+    res = await req.json();
+    callback(res);
+}
 // ----------------------------------------------------------------------------------------
 // -- BOOTSTRAP ---------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------

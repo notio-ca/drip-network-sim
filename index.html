@@ -14,10 +14,10 @@
     <div id="app">
         <div class="container">
             <h1>DRIP Simulator</h1>
-            <div class="table">
+            <div class="table-div">
                 <div class="bg-dark"> <div>Config</div> <div></div> </div>
         
-                <div> <div>BNB Price</div> <div><input v-model.number="bnb_price_usd" type="text"> USD</div></div>
+                <div> <div>BNB Price</div> <div><input v-model.number="bnb_price_usd" type="text"> USD <div class="btn btn-primary mx-2" @click="action($event, 'get_bnb_quote')" data-val="">GET PRICE</div></div></div>
                 <div> <div>BNB/DRIP Ratio</div> <div><input v-model.number="bnb_drip_ratio" type="text"> {{ drip_usd }} USD</div></div>
                 <div> <div>Gas Fee</div> <div><input v-model.number="gas_fee_bnb" type="text"> BNB ({{ bnb_to_usd(gas_fee_bnb) }} USD)</div></div>
                 <div> <div></div> <div></div> </div>
@@ -43,7 +43,7 @@
                             <div class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
                             <div class="btn btn-primary mx-2" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
                         </span>
-                        <span v-else style="font-size:13px;">To claim, set hydrate to stop and step forward.</span>
+                        <span v-else style="font-size:13px;"><br>To claim, set hydrate to stop and step forward.</span>
                     </div> 
                 </div>
                 <div> <div>Claimed</div> <div>{{ drip_to_usd(faucet.claimed) }} USD / {{ faucet.claimed|decimal_3 }} DRIP</div> </div>
