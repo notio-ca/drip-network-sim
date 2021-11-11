@@ -43,7 +43,7 @@
                             <div class="btn btn-primary mx-2" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
                             <div class="btn btn-primary mx-2" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
                         </span>
-                        <span v-else>To claim, set hydrate to none and step forward.</span>
+                        <span v-else style="font-size:13px;">To claim, set hydrate to stop and step forward.</span>
                     </div> 
                 </div>
                 <div> <div>Claimed</div> <div>{{ drip_to_usd(faucet.claimed) }} USD / {{ faucet.claimed|decimal_3 }} DRIP</div> </div>
@@ -66,11 +66,11 @@
                     <div>
                         <span>
                             <div class="btn-group">
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
                                 <label @click="action($event, 'sim-compound-mode')" data-val="NONE" class="btn btn-primary" for="btnradio1">Stop & Collect</label>
                                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
                                 <label @click="action($event, 'sim-compound-mode')" data-val="EVERYDAY" class="btn btn-primary" for="btnradio2">Everyday</label>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
                                 <label @click="action($event, 'sim-compound-mode')" data-val="EVERYSTEP" class="btn btn-primary" for="btnradio3">Every Step</label>
                             </div>
                         </span>

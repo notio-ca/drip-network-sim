@@ -25,7 +25,7 @@ var app = new Vue({
       },
       drip_network_income:0,
       sim: {
-          compound_mode: "NONE",
+          compound_mode: "EVERYSTEP",
           day_passed: 0,
           day_forward: 1
       }
