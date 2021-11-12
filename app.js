@@ -151,7 +151,9 @@ var app = new Vue({
             sold_usd = this.faucet.sold;
             return ((withdraw_usd + sold_usd) - (investment_usd + total_gas_fee_usd)).toFixed(2); 
         },
-        month_passed: function() { return (this.sim.day_passed / 30.5).toFixed(1); }
+        month_passed: function() { return (this.sim.day_passed / 30.5).toFixed(1); },
+        income_week: function () { return (this.faucet.last_day_income * 7).toFixed(2); },
+        income_month: function () { return (this.faucet.last_day_income * 30.5).toFixed(2); }
     },
     filters: {
       decimal_3: function (value) {

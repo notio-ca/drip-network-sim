@@ -34,7 +34,7 @@
                 </div>
         
                 <div class="bg-dark"> <div>Faucet</div> <div></div> </div>
-                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income|decimal_3 }} - Per: Week <span v-html="(faucet.last_day_income * 7)"></span> Month <span v-html="(faucet.last_day_income * 30.5)"></span></div> </div>
+                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income|decimal_3 }} - Per Week {{ income_week }} - Per Month {{ income_month }}</div> </div>
                 <div> <div>Deposits</div> <div>{{ faucet.deposit|decimal_3 }}</div> </div>
                 <div> 
                     <div>Available</div> 
