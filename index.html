@@ -14,52 +14,54 @@
     <div id="app">
         <div class="container">
             <h1>DRIP Simulator</h1>
+            <p>Since we can't simulate the market future, let's assume <b>1 DRIP = 1 USD</b></p>
             <div class="table-div">
                 <div class="bg-dark"> <div>Config</div> <div></div> </div>
-        
+                <!--
                 <div> <div>BNB Price</div> <div><input v-model.number="bnb_price_usd" type="text"> USD <div class="btn btn-primary mx-2" @click="action($event, 'get_bnb_quote')" data-val="">GET PRICE</div></div></div>
                 <div> <div>BNB/DRIP Ratio</div> <div><input v-model.number="bnb_drip_ratio" type="text"> {{ drip_usd }} USD</div></div>
-                <div> <div>Gas Fee</div> <div><input v-model.number="gas_fee_bnb" type="text"> BNB ({{ bnb_to_usd(gas_fee_bnb) }} USD)</div></div>
+                -->
+                <div> <div>Gas Fee</div> <div><input v-model.number="gas_fee" type="text"></div></div>
                 <div> <div></div> <div></div> </div>
         
                 <div class="bg-dark"> <div>Deposit</div> <div></div> </div>
                 <div> 
                     <div>Balance</div>
                     <div> 
-                        <input v-model.number="balance_drip" type="text"> DRIP
+                        <input v-model.number="balance_drip" type="text">
                         <span><div class="btn btn-primary my-1" @click="action($event, 'deposit')" :data-val="balance_drip">DEPOSIT</div></span>
                     </div>
                 </div>
         
                 <div class="bg-dark"> <div>Faucet</div> <div></div> </div>
-                <div> <div>Last Day Income</div> <div>{{ drip_to_usd(faucet.last_day_income) }} USD / {{ faucet.last_day_income|decimal_3 }} DRIP</div> </div>
-                <div> <div>Deposits</div> <div>{{ drip_to_usd(faucet.deposit) }} USD / {{ faucet.deposit|decimal_3 }} DRIP</div> </div>
+                <div> <div>Last Day Income</div> <div>{{ faucet.last_day_income|decimal_3 }} - Week <span v-html="(faucet.last_day_income * 7)"></span></div> </div>
+                <div> <div>Deposits</div> <div>{{ faucet.deposit|decimal_3 }}</div> </div>
                 <div> 
                     <div>Available</div> 
                     <div>
-                        {{ drip_to_usd(faucet.available) }} USD / {{ faucet.available|decimal_3 }} DRIP
-                        <div class="btn btn-primary mr-1" :class="(faucet.available == 0)?'disabled':''" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
+                        {{ faucet.available|decimal_3 }}
+                        <div id="but-claim" class="btn btn-primary mr-1" :class="(faucet.available == 0)?'disabled':''" @click="action($event, 'withdraw')" :data-val="faucet.available">CLAIM</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.available == 0)?'disabled':''" @click="action($event, 'compound')" :data-val="faucet.available">HYDRATE</div>
                         <span v-if="faucet.available == 0" style="font-size:13px;"><br>To claim, set hydrate to stop and step forward.</span>
                     </div> 
                 </div>
-                <div> <div>Claimed</div> <div>{{ drip_to_usd(faucet.claimed) }} USD / {{ faucet.claimed|decimal_3 }} DRIP</div> </div>
-                <div> <div>Max Payout</div> <div>{{ drip_to_usd(faucet_max_payout) }} USD / {{ faucet_max_payout|decimal_3 }} DRIP</div> </div>
+                <div> <div>Claimed</div> <div>{{ faucet.claimed|decimal_3 }}</div> </div>
+                <div> <div>Max Payout</div> <div>{{ faucet_max_payout|decimal_3 }}</div> </div>
                 
-                <div> <div>Investment</div> <div>{{ drip_to_usd(faucet.investment) }} USD / {{ faucet.investment|decimal_3 }} DRIP</div> </div>
+                <div> <div>Investment</div> <div>{{ faucet.investment|decimal_3 }}</div> </div>
                 <div>
                     <div>Withdraw</div>
                     <div>
-                        {{ drip_to_usd(faucet.withdraw) }} USD / {{ faucet.withdraw|decimal_3 }} DRIP
+                        {{ faucet.withdraw|decimal_3 }}
                         <div class="btn btn-primary mr-1" :class="(faucet.withdraw == 0)?'disabled':''" @click="action($event, 'sell')" :data-val="faucet.withdraw">SELL</div>
                     </div>
                 </div>
-                <div> <div>Sold</div> <div>{{ drip_to_usd(faucet.sold) }} USD / {{ faucet.sold|decimal_3 }} DRIP</div> </div>
-                <div> <div>Total Gas Fee</div> <div>{{ bnb_to_usd(gas_fee_total) }} USD / {{ gas_fee_total|decimal_3 }} DRIP</div> </div>
-                <div> <div>Total P&L</div> <div>{{ revenue_usd }} USD</div> </div>
+                <div> <div>Sold</div> <div>{{ faucet.sold|decimal_3 }}</div> </div>
+                <div> <div>Total Gas Fee</div> <div>{{ gas_fee_total|decimal_3 }}</div> </div>
+                <div> <div>Total P&L</div> <div>{{ revenue_usd }}</div> </div>
 
 
-                <div> <div>Total Network Taxes</div> <div>{{ drip_network_income|decimal_3 }} ({{ drip_to_usd(drip_network_income) }} USD)</div> </div>
+                <div> <div>Total Network Taxes</div> <div>{{ drip_network_income|decimal_3 }}</div> </div>
 
                 <div> <div></div> <div></div> </div>
         
@@ -68,16 +70,14 @@
                 <div> 
                     <div>Hydrate (Compound)</div>
                     <div>
-                        <span>
-                            <div class="btn-group">
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
-                                <label @click="action($event, 'sim-compound-mode')" data-val="NONE" class="btn btn-primary" for="btnradio1">Stop & Collect</label>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                                <label @click="action($event, 'sim-compound-mode')" data-val="EVERYDAY" class="btn btn-primary" for="btnradio2">Everyday</label>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
-                                <label @click="action($event, 'sim-compound-mode')" data-val="EVERYSTEP" class="btn btn-primary" for="btnradio3">Every Step</label>
-                            </div>
-                        </span>
+                        <div class="btn-group">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
+                            <label id="but-step-stop" @click="action($event, 'sim-compound-mode')" data-val="NONE" class="btn btn-primary" for="btnradio1">Stop & Collect</label>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
+                            <label id="but-step-every" @click="action($event, 'sim-compound-mode')" data-val="EVERYSTEP" class="btn btn-primary" for="btnradio3">Every Step</label>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                            <label @click="action($event, 'sim-compound-mode')" data-val="EVERYDAY" class="btn btn-primary" for="btnradio2">Everyday</label>
+                        </div>
                     </div>
                 </div>
                 <div> 
@@ -86,7 +86,7 @@
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''" @click="action($event, 'day-forward')" data-val="1">1</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="2">2</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="5">5</div>
-                        <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="7">7</div>
+                        <div id="but-week" class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="7">7</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="10">10</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="14">14</div>
                         <div class="btn btn-primary mr-1" :class="(faucet.deposit == 0)?'disabled':''"  @click="action($event, 'day-forward')" data-val="30">30</div>
@@ -95,13 +95,21 @@
                         <span v-if="faucet.deposit == 0" style="font-size:13px;">Deposit Needed</span>
                     </div>
                 </div>        
-        
+                <div> 
+                    <div>Macro</div>
+                    <div>
+                        <div class="btn btn-primary mr-1" :class="(sim.macro_record)?'disabled':''" @click="action($event, 'macro_record')" data-val="">RECORD</div>
+                        <div class="btn btn-primary mr-1" :class="(!sim.macro_record)?'disabled':''" @click="action($event, 'macro_stop')" data-val="">STOP</div>
+                        <div class="btn btn-primary mr-1" @click="action($event, 'macro_run')" data-val="">RUN</div> Action <span v-html="sim.macro.length"></span>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div><!-- APP -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script><!-- PROD <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="app.js"></script>
 </body>
 </html>

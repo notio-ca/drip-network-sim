@@ -10,10 +10,10 @@ var app = new Vue({
         tax_sell: 0.1,
         tax_compound: 0.05
       },
-      balance_drip: 15.73, //100,
+      balance_drip: 100,
       bnb_price_usd: 100,
       bnb_drip_ratio: 0.03741699008180504, //0.01,
-      gas_fee_bnb: 0.0025,
+      gas_fee: 0.80,
       gas_fee_total: 0.000,
       faucet:{
           available: 0.000,
@@ -29,7 +29,9 @@ var app = new Vue({
       sim: {
           compound_mode: "EVERYSTEP",
           day_passed: 0,
-          day_forward: 1
+          macro_record: false,
+          macro: [],
+          macro_cursor: 0
       }
     },
     created: function () {
@@ -39,17 +41,24 @@ var app = new Vue({
     methods: {
       action(event, cmd) {
         var val = event.target.getAttribute("data-val");
+        if (this.sim.macro_record && cmd.indexOf("macro") == -1) { this.sim.macro.push({cmd:cmd, val:val}); }
+        this.execute(cmd, val);
+      },
+      execute(cmd, val) {
         switch (cmd) {
             case "deposit":           this.deposit(val); break;
-            case "withdraw":          this.withdraw(val); break;
-            case "sell":              this.sell(val); break;
+            case "compound":          this.compound(); break;
+            case "withdraw":          this.withdraw(); break;
+            case "sell":              this.sell(); break;
             case "day-forward":       this.next_day(val); break;
             case "sim-compound-mode": this.sim.compound_mode = val; break;
-            case "compound":          this.compound(val); break;
             case "get_bnb_quote":     this.quote_bnbusd(val); break;               
+            case "macro_run":         this.macro_run(); break;
+            case "macro_record":      this.sim.macro_record = true; break;
+            case "macro_stop":        this.sim.macro_record = false; break;
         }
       },
-      pay_gas() { this.gas_fee_total += this.gas_fee_bnb; },
+      pay_gas() { this.gas_fee_total += this.gas_fee; },
       deposit(amount) {
         tax = amount * this.config.tax_deposit;
         this.drip_network_income += tax;
@@ -79,7 +88,7 @@ var app = new Vue({
         this.faucet.available = 0;
         this.pay_gas();
       },
-      withdraw(amount) {
+      withdraw() {
         if (this.faucet.available == 0) { return false; }
         tax = this.faucet.available * this.config.tax_withdraw;
         this.drip_network_income += tax;
@@ -88,7 +97,7 @@ var app = new Vue({
         this.faucet.available = 0;
         this.pay_gas();
       },
-      sell(amount) {
+      sell() {
         if (this.faucet.withdraw == 0) { return false; }
         tax = this.faucet.withdraw * this.config.tax_sell;
         this.drip_network_income += tax;
@@ -124,16 +133,22 @@ var app = new Vue({
         API_Get("https://api.binance.com/api/v3/ticker/price?symbol=BNBBUSD", function (res) {
             app.bnb_price_usd = parseFloat(res.price);
         });
+      },
+      macro_run: function() {
+        for (action of this.sim.macro) {
+            this.execute(action.cmd, action.val);
+        }
+
       }
     },    
     computed: {
         drip_usd: function() { return this.$options.filters.decimal_3(this.bnb_price_usd * this.bnb_drip_ratio); },
         faucet_max_payout: function() { return this.$options.filters.decimal_3(this.faucet.deposit * (this.config.day_max / 100)); },
         revenue_usd: function() { 
-            investment_usd = this.drip_to_usd(this.faucet.investment);
-            total_gas_fee_usd = this.bnb_to_usd(this.gas_fee_total);
-            withdraw_usd = this.drip_to_usd(this.faucet.withdraw);
-            sold_usd = this.drip_to_usd(this.faucet.sold);
+            investment_usd = this.faucet.investment;
+            total_gas_fee_usd = this.gas_fee_total;
+            withdraw_usd = this.faucet.withdraw;
+            sold_usd = this.faucet.sold;
             return ((withdraw_usd + sold_usd) - (investment_usd + total_gas_fee_usd)).toFixed(2); 
         },
         month_passed: function() { return (this.sim.day_passed / 30.5).toFixed(1); }
