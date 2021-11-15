@@ -10,7 +10,7 @@ var app = new Vue({
         tax_sell: 0.1,
         tax_compound: 0.05
       },
-      balance_drip: 1000,
+      balance_drip: 966,
       bnb_price_usd: 100,
       bnb_drip_ratio: 0.03741699008180504, //0.01,
       gas_fee: 1.00,
